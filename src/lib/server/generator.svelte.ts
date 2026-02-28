@@ -3,7 +3,6 @@ import { generateText } from 'ai';
 import { MISTRAL_API_KEY } from '$env/static/private';
 import { Mistral } from '@mistralai/mistralai';
 
-const model = createMistral({ apiKey: MISTRAL_API_KEY })('codestral-latest');
 const IMAGE_GENERATION_AGENT = 'ag_019ca2b8e655700bb2791b556b55cf17';
 
 export async function generateHtml(
@@ -53,6 +52,7 @@ export async function generateHtml(
 			All images must be inlined SVGs.`;
 	}
 
+	const model = createMistral({ apiKey: MISTRAL_API_KEY })('devstral-latest');
 	const output = await generateText({
 		model,
 		prompt
@@ -117,9 +117,9 @@ export async function generateHtml(
 	})();
 </script>`;
 				if (outputText.includes('</body>')) {
-					outputText = outputText.replace('</body>', script + '\\n</body>');
+					outputText = outputText.replace('</body>', script + '\n</body>');
 				} else if (outputText.includes('</html>')) {
-					outputText = outputText.replace('</html>', script + '\\n</html>');
+					outputText = outputText.replace('</html>', script + '\n</html>');
 				} else {
 					outputText += script;
 				}
@@ -140,6 +140,7 @@ Only output the raw Javascript code. Do not include <script> tags. Do not add an
 
 	console.log(jsPrompt);
 
+	const model = createMistral({ apiKey: MISTRAL_API_KEY })('devstral-latest');
 	const jsOutput = await generateText({
 		model,
 		prompt: jsPrompt
