@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Mavigator from '$lib/Mavigator.svelte';
 </script>
 
 <svelte:head>
