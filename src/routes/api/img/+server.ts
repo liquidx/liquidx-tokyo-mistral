@@ -5,7 +5,7 @@ import { generateImage } from '$lib/server/generator.svelte';
 
 export const HEAD: RequestHandler = async () => {
 	console.log('HEAD request to /api/img');
-	return new Response(null, {
+	return new Response('', {
 		headers: {
 			'Access-Control-Allow-Origin': '*'
 		}
@@ -14,7 +14,7 @@ export const HEAD: RequestHandler = async () => {
 
 export const OPTIONS: RequestHandler = async () => {
 	console.log('OPTIONS request to /api/img');
-	return new Response(null, {
+	return new Response('', {
 		headers: {
 			'Access-Control-Allow-Origin': '*'
 		}
