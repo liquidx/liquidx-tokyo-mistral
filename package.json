@@ -21,6 +21,7 @@
 		"@eslint/compat": "^2.0.2",
 		"@eslint/js": "^9.39.2",
 		"@fontsource/fira-mono": "^5.2.7",
+		"@mistralai/mistralai": "^1.14.1",
 		"@neoconfetti/svelte": "^2.2.2",
 		"@playwright/test": "^1.58.1",
 		"@sveltejs/adapter-auto": "^7.0.0",

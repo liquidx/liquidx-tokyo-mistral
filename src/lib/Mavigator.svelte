@@ -42,7 +42,12 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ url: event.detail.url, text: event.detail.text })
+				body: JSON.stringify({
+					url: event.detail.url,
+					text: event.detail.text,
+					includeJs: false,
+					includeImages: true
+				})
 			});
 
 			if (response.ok) {
