@@ -1,5 +1,6 @@
-import { error, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import { generateHtml, generateJavascript } from '$lib/server/generator.svelte';
+import { dev } from '$app/environment';
 
 import type { RequestHandler } from './$types';
 
@@ -17,7 +18,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		'includeImages: ' + includeImages
 	);
 
-	const html = await generateHtml(url, text, includeImages);
+	const html = await generateHtml(url, text, { generateImages: includeImages, dev: dev });
 
 	let finalHtml = html;
 	let scriptTag = '';
@@ -34,5 +35,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		finalHtml += scriptTag;
 	}
 
-	return json({ html: finalHtml });
+	return json(
+		{ html: finalHtml },
+		{
+			headers: {
+				'Access-Control-Allow-Origin': '*'
+			}
+		}
+	);
 };

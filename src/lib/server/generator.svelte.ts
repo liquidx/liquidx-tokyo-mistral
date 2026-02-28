@@ -9,8 +9,16 @@ const IMAGE_GENERATION_AGENT = 'ag_019ca2b8e655700bb2791b556b55cf17';
 export async function generateHtml(
 	url: string,
 	text: string | undefined,
-	generateImages: boolean = false
+	options: {
+		generateImages: boolean;
+		dev: boolean;
+	} = {
+		generateImages: false,
+		dev: false
+	}
 ): Promise<string> {
+	let baseUrl = options.dev ? 'http://localhost:12222' : 'https://liquidx-tokyo-mistral.vercel.app';
+
 	let textContext = '';
 	if (text) {
 		textContext =
@@ -35,13 +43,10 @@ export async function generateHtml(
 		Ensure the design is nice looking and things are spaced correctly.
 		`;
 
-	if (generateImages) {
+	if (options.generateImages) {
 		prompt += `
 		    For any icons, inline SVGs in to the HTML.
-
-
-		    For any images, include an img tag with a src URL, alt parameter for the description of the image and 
-    with the correct width and height specified in the HTML tag.
+		    For any images, that should be shown. Include the URL in src, the description in alt, and the width and height in width and height. 
 `;
 	} else {
 		prompt += `
@@ -55,24 +60,68 @@ export async function generateHtml(
 
 	// Generate any images that are included
 	let outputText = output.text;
-	if (generateImages) {
+	if (options.generateImages) {
 		const imgTags = outputText.matchAll(/<img[^>]*>/gi);
 		if (imgTags) {
+			const imagesToProcess: any[] = [];
 			for (const imgTag of Array.from(imgTags)) {
 				console.log(imgTag[0]);
 				const src = imgTag[0].match(/src="([^"]*)"/i);
-				const width = imgTag[0].match(/width="([^"]*)"/i);
-				const height = imgTag[0].match(/height="([^"]*)"/i);
-				const alt = imgTag[0].match(/alt="([^"]*)"/i);
-				if (src && width && height && alt) {
-					// Generate the image
-					const imageUrl = await generateImage(src[1], alt[1], width[1], height[1]);
-					if (imageUrl) {
-						outputText = outputText.replace(
-							imgTag[0],
-							`<img src="${imageUrl}" alt="${alt[1]}" width="${width[1]}" height="${height[1]}">`
-						);
+				const width = imgTag[0].match(/width="([^"]*)"/i) ?? ['', '200'];
+				const height = imgTag[0].match(/height="([^"]*)"/i) ?? ['', '200'];
+				const alt = imgTag[0].match(/alt="([^"]*)"/i) ?? ['', ''];
+				if (src) {
+					const imgId = 'img-' + Math.random().toString(36).substring(2, 9);
+					imagesToProcess.push({
+						id: imgId,
+						url: src[1],
+						description: alt[1],
+						width: width[1],
+						height: height[1]
+					});
+
+					const placeholder = `${baseUrl}/empty.png`;
+					outputText = outputText.replace(
+						imgTag[0],
+						`<img id="${imgId}" src="${placeholder}" alt="${alt[1]}" width="${width[1]}" height="${height[1]}">`
+					);
+				}
+			}
+
+			if (imagesToProcess.length > 0) {
+				const script = `
+<script>
+	(function() {
+		const images = ${JSON.stringify(imagesToProcess)};
+		Promise.all(images.map(async (img) => {
+			try {
+				console.log('Loading image: ' + img.url);
+				const response = await fetch('${baseUrl}/api/img', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ url: img.url, description: img.description, width: img.width, height: img.height })
+				});
+				if (response.ok) {
+					const data = await response.json();
+					if (data.url) {
+						const imgElement = document.getElementById(img.id);
+						if (imgElement) {
+							imgElement.src = data.url;
+						}
 					}
+				}
+			} catch (e) {
+				console.error('Failed to load image:', e);
+			}
+		}));
+	})();
+</script>`;
+				if (outputText.includes('</body>')) {
+					outputText = outputText.replace('</body>', script + '\\n</body>');
+				} else if (outputText.includes('</html>')) {
+					outputText = outputText.replace('</html>', script + '\\n</html>');
+				} else {
+					outputText += script;
 				}
 			}
 		}
@@ -138,7 +187,7 @@ export const generateImage = async (
 
 	console.log(output);
 
-	let contents = output.content;
+	let contents = (output as any).content;
 	if (!contents || contents.length == 0) {
 		console.log('No contents found');
 		return null;
