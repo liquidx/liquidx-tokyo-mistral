@@ -4,6 +4,35 @@
 	import BrowserFrameWindowButton from './BrowserFrameWindowButton.svelte';
 	import BrowserFrameLoadingIndicator from './BrowserFrameLoadingIndicator.svelte';
 
+	export interface MenuItem {
+		label?: string;
+		shortcut?: string;
+		action?: string;
+		separator?: boolean;
+		checked?: boolean;
+	}
+
+	export interface Menu {
+		id: string;
+		label: string;
+		items: MenuItem[];
+	}
+
+	let activeMenuId = $state<string | null>(null);
+
+	function toggleMenu(id: string, event: MouseEvent) {
+		event.stopPropagation();
+		if (activeMenuId === id) {
+			activeMenuId = null;
+		} else {
+			activeMenuId = id;
+		}
+	}
+
+	function handleWindowClick() {
+		activeMenuId = null;
+	}
+
 	let currentUrl = $state('');
 	let browserTitle = $state('Metscape Mavigator');
 
@@ -76,6 +105,8 @@
 		canGoBack?: boolean;
 		canGoForward?: boolean;
 		currentUrlProp?: string;
+		loadImages?: boolean;
+		loadJavascript?: boolean;
 		onurlchange?: (event: CustomEvent<{ url: string }>) => void;
 		onlinkclick?: (event: CustomEvent<{ url: string; text: string }>) => void;
 		onback?: () => void;
@@ -90,6 +121,8 @@
 		canGoBack = false,
 		canGoForward = false,
 		currentUrlProp,
+		loadImages = $bindable(true),
+		loadJavascript = $bindable(false),
 		onurlchange,
 		onlinkclick,
 		onback,
@@ -97,6 +130,73 @@
 		onreload,
 		onhome
 	}: Props = $props();
+
+	let menuBarData: Menu[] = $derived([
+		{
+			id: 'file',
+			label: '<u>F</u>ile',
+			items: [
+				{ label: 'New Web Browser', shortcut: 'Ctrl+N' },
+				{ label: 'New Document', shortcut: '' },
+				{ separator: true },
+				{ label: 'Open Location...', shortcut: 'Ctrl+L' },
+				{ label: 'Open File...', shortcut: 'Ctrl+O' },
+				{ separator: true },
+				{ label: 'Close', shortcut: 'Ctrl+W' },
+				{ label: 'Exit', shortcut: 'Ctrl+Q' }
+			]
+		},
+		{
+			id: 'edit',
+			label: '<u>E</u>dit',
+			items: [
+				{ label: 'Undo', shortcut: 'Ctrl+Z' },
+				{ separator: true },
+				{ label: 'Cut', shortcut: 'Ctrl+X' },
+				{ label: 'Copy', shortcut: 'Ctrl+C' },
+				{ label: 'Paste', shortcut: 'Ctrl+V' },
+				{ separator: true },
+				{ label: 'Find in Page...', shortcut: 'Ctrl+F' }
+			]
+		},
+		{
+			id: 'view',
+			label: '<u>V</u>iew',
+			items: [
+				{ label: 'Reload', shortcut: 'Ctrl+R', action: 'reload' },
+				{ label: 'Reload Frame', shortcut: '' },
+				{ separator: true },
+				{ label: 'Document Source', shortcut: 'Ctrl+U' }
+			]
+		},
+		{
+			id: 'go',
+			label: '<u>G</u>o',
+			items: [
+				{ label: 'Back', shortcut: 'Alt+Left', action: 'back' },
+				{ label: 'Forward', shortcut: 'Alt+Right', action: 'forward' },
+				{ label: 'Home', action: 'home' },
+				{ label: 'Stop Loading', shortcut: 'Esc' }
+			]
+		},
+		{
+			id: 'bookmarks',
+			label: '<u>B</u>ookmarks',
+			items: [{ label: 'Add Bookmark', shortcut: 'Ctrl+D' }]
+		},
+		{
+			id: 'options',
+			label: '<u>O</u>ptions',
+			items: [
+				{ label: 'General Preferences...' },
+				{ separator: true },
+				{ label: 'Load Images', action: 'toggleImages', checked: loadImages },
+				{ label: 'Load Javascript', action: 'toggleJavascript', checked: loadJavascript }
+			]
+		},
+		{ id: 'directory', label: '<u>D</u>irectory', items: [{ label: "Netscape's Home" }] },
+		{ id: 'help', label: '<u>H</u>elp', items: [{ label: 'About Netscape...' }] }
+	]);
 
 	// Update currentUrl when prop changes (for back navigation)
 	$effect(() => {
@@ -239,9 +339,11 @@
 		if (!browser) return;
 
 		window.addEventListener('message', handleMessage);
+		window.addEventListener('click', handleWindowClick);
 
 		return () => {
 			window.removeEventListener('message', handleMessage);
+			window.removeEventListener('click', handleWindowClick);
 		};
 	});
 </script>
@@ -311,15 +413,63 @@
 		</div>
 	</div>
 
-	<div class="flex flex-nowrap overflow-x-clip p-0.5 select-none">
-		<span class="mr-0.5 px-1.5 py-0.5"><u>F</u>ile</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>E</u>dit</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>V</u>iew</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>G</u>o</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>B</u>ookmarks</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>O</u>ptions</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>D</u>irectory</span>
-		<span class="mr-0.5 px-1.5 py-0.5"><u>H</u>elp</span>
+	<div class="relative z-50 flex flex-nowrap p-0.5 select-none">
+		{#each menuBarData as menu}
+			<div class="relative">
+				<button
+					type="button"
+					class="mr-0.5 px-1.5 py-0.5 focus:outline-none {activeMenuId === menu.id
+						? 'bg-blue-800 text-white'
+						: ''}"
+					onclick={(e) => toggleMenu(menu.id, e)}
+					onmouseenter={() => {
+						if (activeMenuId && activeMenuId !== menu.id) activeMenuId = menu.id;
+					}}
+				>
+					{@html menu.label}
+				</button>
+
+				{#if activeMenuId === menu.id}
+					<div
+						class="absolute top-full left-0 min-w-[200px] border-2 border-t-gray-100 border-r-gray-600 border-b-gray-600 border-l-gray-100 bg-gray-300 py-1 shadow-md"
+						onclick={(e) => e.stopPropagation()}
+						role="menu"
+						tabindex="-1"
+					>
+						{#each menu.items as item}
+							{#if item.separator}
+								<div class="mx-1 my-1 border-t border-b border-t-gray-500 border-b-gray-100"></div>
+							{:else}
+								<button
+									type="button"
+									class="group flex w-full justify-between px-4 py-0.5 text-left hover:bg-blue-800 hover:text-white focus:outline-none disabled:opacity-50"
+									onclick={() => {
+										activeMenuId = null;
+										if (item.action === 'back' && canGoBack && onback) onback();
+										if (item.action === 'forward' && canGoForward && onforward) onforward();
+										if (item.action === 'home' && onhome) onhome();
+										if (item.action === 'reload' && onreload) onreload();
+										if (item.action === 'toggleImages') loadImages = !loadImages;
+										if (item.action === 'toggleJavascript') loadJavascript = !loadJavascript;
+									}}
+								>
+									<div>
+										{#if item.checked !== undefined}
+											<span class="inline-block w-4 text-center">{item.checked ? '✓' : ''}</span>
+										{/if}
+										<span>{item.label}</span>
+									</div>
+									{#if item.shortcut}
+										<span class="ml-4 text-gray-700 group-hover:text-gray-300">{item.shortcut}</span
+										>
+									{/if}
+								</button>
+							{/if}
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/each}
 	</div>
 
 	<div

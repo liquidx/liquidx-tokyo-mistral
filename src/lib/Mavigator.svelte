@@ -30,6 +30,8 @@
 	let history = $state<HistoryEntry[]>([]);
 	let currentHistoryIndex = $state(-1);
 	let currentUrl = $state('');
+	let loadImages = $state(true);
+	let loadJavascript = $state(false);
 
 	const handleUrlChange = async (event: CustomEvent<{ url: string; text?: string }>) => {
 		console.log('URL changed to:', event.detail.url);
@@ -45,8 +47,8 @@
 				body: JSON.stringify({
 					url: event.detail.url,
 					text: event.detail.text,
-					includeJs: false,
-					includeImages: true
+					includeJs: loadJavascript,
+					includeImages: loadImages
 				})
 			});
 
@@ -139,4 +141,6 @@
 	{canGoBack}
 	{canGoForward}
 	currentUrlProp={currentUrl}
+	bind:loadImages
+	bind:loadJavascript
 />
