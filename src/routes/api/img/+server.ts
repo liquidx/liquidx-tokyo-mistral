@@ -7,7 +7,7 @@ export const HEAD: RequestHandler = async () => {
 	console.log('HEAD request to /api/img');
 	return new Response('', {
 		headers: {
-			'Access-Control-Allow-Origin': '*'
+			'Access-Control-Allow-Origin': 'null'
 		}
 	});
 };
@@ -16,7 +16,7 @@ export const OPTIONS: RequestHandler = async () => {
 	console.log('OPTIONS request to /api/img');
 	return new Response('', {
 		headers: {
-			'Access-Control-Allow-Origin': '*'
+			'Access-Control-Allow-Origin': 'null'
 		}
 	});
 };
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		{ url },
 		{
 			headers: {
-				'Access-Control-Allow-Origin': '*'
+				'Access-Control-Allow-Origin': 'null'
 			}
 		}
 	);

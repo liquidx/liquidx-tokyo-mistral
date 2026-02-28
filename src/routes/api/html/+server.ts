@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		'includeImages: ' + includeImages
 	);
 
-	const html = await generateHtml(url, text, { generateImages: includeImages, dev: dev });
+	const html = await generateHtml(url, text, { generateImages: includeImages, dev: false });
 
 	let finalHtml = html;
 	let scriptTag = '';

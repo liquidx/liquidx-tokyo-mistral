@@ -240,8 +240,8 @@
 		return `data:text/html;charset=utf-8,${encodeURIComponent(modifiedHtml)}`;
 	}
 
-	const dataUrl = $derived(createDataUrl(contents));
-	const statusText = $derived(loading ? 'Loading...' : 'Done');
+	let dataUrl = $derived(createDataUrl(contents));
+	let statusText = $derived(loading ? 'Loading...' : 'Done');
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
@@ -311,7 +311,7 @@
 			// If the URL starts with http, use it directly
 			if (event.data.url.startsWith('http://') || event.data.url.startsWith('https://')) {
 				resolvedUrl = event.data.url;
-			} else if (event.data.url.startsWith('data:')) {
+			} else if (event.data.url.startsWith('data:') || event.data.url.startsWith('blob:')) {
 				// If it's a data URL, generate URL path from the link text
 				const pathFromText = textToUrlPath(event.data.text);
 				const urlPath = pathFromText ? `/${pathFromText}` : '/';
