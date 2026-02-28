@@ -3,6 +3,7 @@
 	import BrowserFrameButton from './BrowserFrameButton.svelte';
 	import BrowserFrameWindowButton from './BrowserFrameWindowButton.svelte';
 	import BrowserFrameLoadingIndicator from './BrowserFrameLoadingIndicator.svelte';
+	import MistralLogo from './images/mistral.svg?raw';
 
 	export interface MenuItem {
 		label?: string;
@@ -412,18 +413,7 @@
 	<div
 		class="flex items-center justify-between bg-[#000080] px-1 py-0.5 font-bold text-white select-none"
 	>
-		<div class="flex items-center">
-			<svg width="16" height="16" viewBox="0 0 24 24" class="mr-1"
-				><rect width="24" height="24" fill="#595959" /><text
-					x="12"
-					y="18"
-					fill="white"
-					font-weight="bold"
-					font-family="serif"
-					text-anchor="middle"
-					font-size="20">N</text
-				></svg
-			>
+		<div class="px2 flex items-center px-2 py-1">
 			<div class="text-[13px]">{browserTitle}</div>
 		</div>
 		<div class="flex">
@@ -508,12 +498,14 @@
 					height="24"
 					viewBox="0 0 24 24"
 					fill="none"
-					class="mb-[1px]"
-					stroke="#888888"
-					stroke-width="2"
+					stroke="#6b7280"
+					stroke-width="2.5"
 					stroke-linecap="round"
-					stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg
+					stroke-linejoin="round"
+					class="mb-[1px]"
 				>
+					<path d="M15 18l-6-6 6-6" />
+				</svg>
 				<span class="text-[11px] leading-none">Back</span>
 			</BrowserFrameButton>
 			<BrowserFrameButton onclick={canGoForward ? onforward : undefined} disabled={!canGoForward}>
@@ -522,12 +514,14 @@
 					height="24"
 					viewBox="0 0 24 24"
 					fill="none"
-					class="mb-[1px]"
-					stroke="#888888"
-					stroke-width="2"
+					stroke="#6b7280"
+					stroke-width="2.5"
 					stroke-linecap="round"
-					stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg
+					stroke-linejoin="round"
+					class="mb-[1px]"
 				>
+					<path d="M9 18l6-6-6-6" />
+				</svg>
 				<span class="text-[11px] leading-none">Forward</span>
 			</BrowserFrameButton>
 			<BrowserFrameButton onclick={onreload}>

@@ -21,14 +21,14 @@
 		<!-- Container needs to be square and large enough to cover the whole shape while rotating -->
 		<div
 			class="pointer-events-none absolute aspect-square w-[300%]"
-			style="background: linear-gradient(to bottom, #cbcbcb, #b2b2b2, #999999, #7b7b7b, #464646, #cbcbcb);"
+			style="background: linear-gradient(to bottom, #FFD800, #FFAF00, #FF8205, #FA500F, #E10500, #FFD800);"
 			class:spinning={loading}
 		></div>
 	</div>
 
 	<!-- Red overlay Mistral Logo (hides when loading to show gradient) -->
 	<div
-		class="pointer-events-none absolute inset-0 z-10 h-full w-full text-[#464646] transition-opacity duration-300"
+		class="pointer-events-none absolute inset-0 z-10 h-full w-full text-[#E10500] transition-opacity duration-300"
 		class:opacity-0={loading}
 		class:opacity-100={!loading}
 	>
