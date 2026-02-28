@@ -58,12 +58,11 @@ export async function generateHtml(
 		prompt
 	});
 
-	// Generate any images that are included
 	let outputText = output.text;
+	const imagesToProcess: any[] = [];
 	if (options.generateImages) {
 		const imgTags = outputText.matchAll(/<img[^>]*>/gi);
 		if (imgTags) {
-			const imagesToProcess: any[] = [];
 			for (const imgTag of Array.from(imgTags)) {
 				console.log(imgTag[0]);
 				const src = imgTag[0].match(/src="([^"]*)"/i);
@@ -87,12 +86,17 @@ export async function generateHtml(
 					);
 				}
 			}
+		}
+	}
 
-			if (imagesToProcess.length > 0) {
-				const script = `
+	const script = `
 <script>
 	(function() {
 		const images = ${JSON.stringify(imagesToProcess)};
+		if (images.length === 0) {
+			window.parent.postMessage({ type: 'imagesLoaded' }, '*');
+			return;
+		}
 		Promise.all(images.map(async (img) => {
 			try {
 				console.log('Loading image: ' + img.url);
@@ -113,18 +117,17 @@ export async function generateHtml(
 			} catch (e) {
 				console.error('Failed to load image:', e);
 			}
-		}));
+		})).finally(() => {
+			window.parent.postMessage({ type: 'imagesLoaded' }, '*');
+		});
 	})();
 </script>`;
-				if (outputText.includes('</body>')) {
-					outputText = outputText.replace('</body>', script + '\n</body>');
-				} else if (outputText.includes('</html>')) {
-					outputText = outputText.replace('</html>', script + '\n</html>');
-				} else {
-					outputText += script;
-				}
-			}
-		}
+	if (outputText.includes('</body>')) {
+		outputText = outputText.replace('</body>', script + '\n</body>');
+	} else if (outputText.includes('</html>')) {
+		outputText = outputText.replace('</html>', script + '\n</html>');
+	} else {
+		outputText += script;
 	}
 
 	return outputText;

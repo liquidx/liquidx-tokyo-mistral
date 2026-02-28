@@ -118,7 +118,7 @@
 
 	let {
 		contents = '',
-		loading = false,
+		loading = $bindable(false),
 		canGoBack = false,
 		canGoForward = false,
 		currentUrlProp,
@@ -339,6 +339,8 @@
 					}
 				})
 			);
+		} else if (event.data && event.data.type === 'imagesLoaded') {
+			loading = false;
 		}
 	}
 

@@ -59,11 +59,13 @@
 				}
 			} else {
 				console.error('Error fetching API:', response.statusText);
+				isLoading = false;
 			}
 		} catch (error) {
 			console.error('Network error:', error);
-		} finally {
 			isLoading = false;
+		} finally {
+			// Loading state is disabled when BrowserFrame emits 'imagesLoaded' message.
 		}
 	};
 
@@ -120,7 +122,7 @@
 	onreload={handleReload}
 	onhome={handleHome}
 	contents={htmlBody}
-	loading={isLoading}
+	bind:loading={isLoading}
 	{canGoBack}
 	{canGoForward}
 	currentUrlProp={currentUrl}
