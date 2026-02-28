@@ -1,30 +1,13 @@
 <script lang="ts">
 	import BrowserFrame from '$lib/BrowserFrame.svelte';
+	import homepage from '$lib/homepage.html?raw';
 
 	interface HistoryEntry {
 		url: string;
 		content: string;
 	}
 
-	const initialBody = `<html>
-	<body style="padding: 16px; max-width: 400px; font-family: sans-serif;">
-		<h1>The Eternal Browser of the Spotless Transformer Mind.</h1>
-		<p>
-		Type the URL of your dreams into the location bar and hit enter, the LLM will tell you want it thinks the website will look like.
-		The weirder the better. 
-		</p>
-		<h2>Examples</h2>
-		<ul>
-		<li><a href="http://twitter.com/@christophercolumbus">twitter.com/@christophercolumbus</a></li>
-		<li><a href="http://twitter.com/@shakespeare">http://twitter.com/@shakespeare</a></li>
-		<li><a href="http://greatestpoems.com/">greatestpoems.com</a></li>
-		<li><a href="http://cutest-llamas.org/">cutest-llamas.org</a></li>
-		
-		</ul>
-
-	</body>
-	</html>`;
-
+	const initialBody = homepage;
 	let htmlBody = $state(initialBody);
 	let isLoading = $state(false);
 	let history = $state<HistoryEntry[]>([]);
