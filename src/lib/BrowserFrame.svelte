@@ -34,7 +34,7 @@
 	}
 
 	let currentUrl = $state('');
-	let browserTitle = $state('Metscape Mavigator');
+	let browserTitle = $state('Miscape Mavigator');
 
 	let windowWidth = $state<number | undefined>(undefined);
 	let windowHeight = $state<number | undefined>(undefined);
