@@ -176,7 +176,10 @@
 				{ label: 'Back', shortcut: 'Alt+Left', action: 'back' },
 				{ label: 'Forward', shortcut: 'Alt+Right', action: 'forward' },
 				{ label: 'Home', action: 'home' },
-				{ label: 'Stop Loading', shortcut: 'Esc' }
+				{ label: 'Stop Loading', shortcut: 'Esc' },
+				{ separator: true },
+				{ label: 'Load Images', action: 'toggleImages', checked: loadImages },
+				{ label: 'Load Javascript', action: 'toggleJavascript', checked: loadJavascript }
 			]
 		},
 		{
@@ -194,7 +197,11 @@
 				{ label: 'Load Javascript', action: 'toggleJavascript', checked: loadJavascript }
 			]
 		},
-		{ id: 'directory', label: '<u>D</u>irectory', items: [{ label: "Netscape's Home" }] },
+		{
+			id: 'window',
+			label: '<u>W</u>indow',
+			items: [{ label: 'Bookmarks', shortcut: 'Ctrl+B' }]
+		},
 		{ id: 'help', label: '<u>H</u>elp', items: [{ label: 'About Netscape...' }] }
 	]);
 
@@ -353,7 +360,7 @@
 </svelte:head>
 
 <div
-	class="browser-window font-oldbrowser relative mx-auto my-8 flex w-[320px] flex-col border-2 border-t-white border-r-gray-600 border-b-gray-600 border-l-white bg-gray-300 text-xs text-gray-600 shadow-lg md:w-[800px]"
+	class="browser-window font-oldbrowser relative mx-auto my-8 flex w-[320px] flex-col border border-t-[3px] border-r-[3px] border-b-[3px] border-l-[3px] border-t-white border-r-gray-800 border-b-gray-800 border-l-white bg-[#C0C0C0] pb-1 text-xs text-black shadow-lg md:w-[800px]"
 	style="{windowWidth ? `width: ${windowWidth}px;` : ''} {windowHeight
 		? `height: ${windowHeight}px;`
 		: ''}"
@@ -403,9 +410,22 @@
 	></div>
 
 	<div
-		class="flex items-center justify-between bg-gradient-to-r from-blue-800 to-blue-400 px-2 py-1 font-bold text-white select-none"
+		class="flex items-center justify-between bg-[#000080] px-1 py-0.5 font-bold text-white select-none"
 	>
-		<div>{browserTitle}</div>
+		<div class="flex items-center">
+			<svg width="16" height="16" viewBox="0 0 24 24" class="mr-1"
+				><rect width="24" height="24" fill="#595959" /><text
+					x="12"
+					y="18"
+					fill="white"
+					font-weight="bold"
+					font-family="serif"
+					text-anchor="middle"
+					font-size="20">N</text
+				></svg
+			>
+			<div class="text-[13px]">{browserTitle}</div>
+		</div>
 		<div class="flex">
 			<BrowserFrameWindowButton type="minimize" />
 			<BrowserFrameWindowButton type="maximize" />
@@ -413,14 +433,17 @@
 		</div>
 	</div>
 
-	<div class="relative z-50 flex flex-nowrap p-0.5 select-none">
+	<!-- Menu Bar -->
+	<div
+		class="relative z-50 flex flex-nowrap border-b border-b-white px-1 shadow-[0_1px_0_0_#808080] select-none"
+	>
 		{#each menuBarData as menu}
-			<div class="relative">
+			<div class="relative py-1">
 				<button
 					type="button"
-					class="mr-0.5 px-1.5 py-0.5 focus:outline-none {activeMenuId === menu.id
-						? 'bg-blue-800 text-white'
-						: ''}"
+					class="px-2 focus:outline-none {activeMenuId === menu.id
+						? 'bg-[#000080] text-white'
+						: 'text-black'}"
 					onclick={(e) => toggleMenu(menu.id, e)}
 					onmouseenter={() => {
 						if (activeMenuId && activeMenuId !== menu.id) activeMenuId = menu.id;
@@ -431,18 +454,18 @@
 
 				{#if activeMenuId === menu.id}
 					<div
-						class="absolute top-full left-0 min-w-[200px] border-2 border-t-gray-100 border-r-gray-600 border-b-gray-600 border-l-gray-100 bg-gray-300 py-1 shadow-md"
+						class="absolute top-full left-0 min-w-[200px] border-2 border-t-white border-r-gray-800 border-b-gray-800 border-l-white bg-[#C0C0C0] py-1 text-black shadow-md"
 						onclick={(e) => e.stopPropagation()}
 						role="menu"
 						tabindex="-1"
 					>
 						{#each menu.items as item}
 							{#if item.separator}
-								<div class="mx-1 my-1 border-t border-b border-t-gray-500 border-b-gray-100"></div>
+								<div class="mx-1 my-1 border-t border-b border-t-gray-500 border-b-white"></div>
 							{:else}
 								<button
 									type="button"
-									class="group flex w-full justify-between px-4 py-0.5 text-left hover:bg-blue-800 hover:text-white focus:outline-none disabled:opacity-50"
+									class="group flex w-full justify-between px-4 py-0.5 text-left hover:bg-[#000080] hover:text-white focus:outline-none disabled:opacity-50"
 									onclick={() => {
 										activeMenuId = null;
 										if (item.action === 'back' && canGoBack && onback) onback();
@@ -460,8 +483,7 @@
 										<span>{item.label}</span>
 									</div>
 									{#if item.shortcut}
-										<span class="ml-4 text-gray-700 group-hover:text-gray-300">{item.shortcut}</span
-										>
+										<span class="ml-4">{item.shortcut}</span>
 									{/if}
 								</button>
 							{/if}
@@ -472,59 +494,333 @@
 		{/each}
 	</div>
 
-	<div
-		class="flex items-center justify-between overflow-x-clip border-t border-b border-t-white border-b-gray-500 p-1"
-	>
-		<div class="flex flex-wrap">
-			<BrowserFrameButton onclick={canGoBack ? onback : undefined} disabled={!canGoBack}
-				>Back</BrowserFrameButton
-			>
-			<BrowserFrameButton onclick={canGoForward ? onforward : undefined} disabled={!canGoForward}
-				>Forward</BrowserFrameButton
-			>
-			<BrowserFrameButton onclick={onhome}>Home</BrowserFrameButton>
-			<BrowserFrameButton onclick={onreload}>Reload</BrowserFrameButton>
-			<BrowserFrameButton disabled={!loading}>Stop</BrowserFrameButton>
+	<!-- Navigation Toolbar -->
+	<div class="flex items-center border-b border-b-white pt-1 pb-0 shadow-[0_1px_0_0_#808080]">
+		<!-- Etched Handle -->
+		<div class="mr-1 ml-0.5 flex h-10 flex-col justify-center">
+			<div class="h-full w-1 border-r border-l border-r-gray-500 border-l-white"></div>
 		</div>
-		<BrowserFrameLoadingIndicator {loading} />
+
+		<div class="flex flex-grow flex-wrap gap-0.5">
+			<BrowserFrameButton onclick={canGoBack ? onback : undefined} disabled={!canGoBack}>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					class="mb-[1px]"
+					stroke="#888888"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg
+				>
+				<span class="text-[11px] leading-none">Back</span>
+			</BrowserFrameButton>
+			<BrowserFrameButton onclick={canGoForward ? onforward : undefined} disabled={!canGoForward}>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					class="mb-[1px]"
+					stroke="#888888"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg
+				>
+				<span class="text-[11px] leading-none">Forward</span>
+			</BrowserFrameButton>
+			<BrowserFrameButton onclick={onreload}>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="black"
+					stroke-width="1.5"
+					class="mb-[1px]"
+					><path
+						d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"
+						fill="#797979"
+					/></svg
+				>
+				<span class="text-[11px] leading-none">Reload</span>
+			</BrowserFrameButton>
+			<BrowserFrameButton onclick={onhome}>
+				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="mb-[1px]"
+					><polygon points="12,3 2,12 22,12" fill="#808080" stroke="black" stroke-width="1" /><rect
+						x="4"
+						y="12"
+						width="16"
+						height="10"
+						fill="#afafaf"
+						stroke="black"
+						stroke-width="1"
+					/></svg
+				>
+				<span class="text-[11px] leading-none">Home</span>
+			</BrowserFrameButton>
+
+			<div class="flex items-center justify-center px-1 py-1">
+				<div class="h-8 border-r border-l border-r-white border-l-gray-500"></div>
+			</div>
+
+			<BrowserFrameButton>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="black"
+					stroke-width="1.5"
+					class="mb-[1px]"
+					><circle cx="10" cy="10" r="6" fill="#9a9a9a" /><line
+						x1="14.5"
+						y1="14.5"
+						x2="20"
+						y2="20"
+					/></svg
+				>
+				<span class="text-[11px] leading-none">Search</span>
+			</BrowserFrameButton>
+
+			<BrowserFrameButton>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					class="mb-[1px]"
+					stroke="black"
+					stroke-width="1.5"
+					><rect x="4" y="10" width="16" height="10" fill="#e6e6e6" /><rect
+						x="6"
+						y="2"
+						width="12"
+						height="8"
+						fill="white"
+					/><line x1="8" y1="5" x2="16" y2="5" /><line x1="8" y1="7" x2="16" y2="7" /></svg
+				>
+				<span class="text-[11px] leading-none">Print</span>
+			</BrowserFrameButton>
+			<BrowserFrameButton>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="black"
+					stroke-width="1.5"
+					class="mb-[1px]"
+					><rect x="6" y="11" width="12" height="10" fill="#afafaf" /><path
+						d="M8 11V7a4 4 0 018 0v4"
+					/></svg
+				>
+				<span class="text-[11px] leading-none">Security</span>
+			</BrowserFrameButton>
+			<BrowserFrameButton disabled={!loading}>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="black"
+					stroke-width="1.5"
+					class="mb-[1px]"
+					><circle cx="12" cy="12" r="10" fill="#777777" /><circle
+						cx="12"
+						cy="12"
+						r="6"
+						fill="white"
+						stroke="none"
+					/></svg
+				>
+				<span class="text-[11px] leading-none">Stop</span>
+			</BrowserFrameButton>
+		</div>
+
+		<div class="relative mr-1 ml-1 flex h-12 w-12 items-center justify-center overflow-hidden">
+			<BrowserFrameLoadingIndicator {loading} />
+		</div>
 	</div>
 
-	<div class="flex items-center p-1">
-		<label for="location-input" class="mx-2 font-bold">Location:</label>
+	<!-- Location Bar -->
+	<div class="flex items-center border-b border-b-white py-1 shadow-[0_1px_0_0_#808080]">
+		<!-- Etched Handle -->
+		<div class="mr-1 ml-0.5 flex h-5 flex-col justify-center">
+			<div class="h-full w-1 border-r border-l border-r-gray-500 border-l-white"></div>
+		</div>
+
+		<button
+			class="mx-0.5 flex items-center border border-transparent px-1.5 py-0.5 text-black hover:border-t-white hover:border-r-gray-600 hover:border-b-gray-600 hover:border-l-white"
+		>
+			<svg
+				width="12"
+				height="12"
+				viewBox="0 0 24 24"
+				class="mr-1 fill-gray-500"
+				stroke="black"
+				stroke-width="1"
+				><path d="M4 2v20h16V2H4z" /><line
+					x1="16"
+					y1="6"
+					x2="16"
+					y2="18"
+					stroke="#4c4c4c"
+					stroke-width="2"
+				/></svg
+			>
+			<span class="mr-1 text-[13px]">Bookmarks</span>
+			<svg width="8" height="8" viewBox="0 0 24 24"
+				><polygon points="0,0 24,0 12,12" fill="black" /></svg
+			>
+		</button>
+
+		<label for="location-input" class="mx-1 text-[13px] whitespace-nowrap">Location:</label>
 		<input
 			id="location-input"
 			type="text"
-			class="font-inherit flex-grow border-2 border-t-gray-600 border-r-gray-100 border-b-gray-100 border-l-gray-600 bg-white px-0.5 py-0.5 text-inherit"
+			class="font-inherit h-6 min-w-[50px] flex-grow border-2 border-t-gray-600 border-r-white border-b-white border-l-gray-600 bg-white px-1 py-0.5 text-inherit focus:outline-none"
 			bind:value={currentUrl}
 			onkeydown={handleKeyDown}
 			onfocus={handleFocus}
 		/>
-		<div class="mx-2">
-			<BrowserFrameButton onclick={handleGoClick}>Go</BrowserFrameButton>
+
+		<button class="mx-0.5 flex items-center px-1.5 py-0.5 font-bold" onclick={handleGoClick}>
+			<span class="mx-1 text-[13px] whitespace-nowrap">Go</span>
+		</button>
+	</div>
+
+	<!-- Personal Toolbar -->
+	<div class="flex items-center border-b border-b-white py-0.5 shadow-[0_1px_0_0_#808080]">
+		<!-- Etched Handle -->
+		<div class="mr-1 ml-0.5 flex h-5 flex-col justify-center">
+			<div class="h-full w-1 border-r border-l border-r-gray-500 border-l-white"></div>
+		</div>
+
+		<div class="flex flex-nowrap gap-x-4 overflow-hidden px-1 text-[13px] text-[#000080]">
+			<span class="flex cursor-pointer items-center whitespace-nowrap hover:underline"
+				><svg width="12" height="12" viewBox="0 0 24 24" class="mr-1 mb-[1px]"
+					><rect width="24" height="16" y="4" fill="#c4c4c4" stroke="black" stroke-width="1" /></svg
+				>WebMail</span
+			>
+			<span class="flex cursor-pointer items-center whitespace-nowrap hover:underline"
+				><svg width="12" height="12" viewBox="0 0 24 24" class="mr-1 mb-[1px]"
+					><circle cx="12" cy="12" r="8" fill="#9b9b9b" stroke="black" stroke-width="1" /></svg
+				>Contact</span
+			>
+			<span class="flex cursor-pointer items-center whitespace-nowrap hover:underline"
+				><svg width="12" height="12" viewBox="0 0 24 24" class="mr-1 mb-[1px]"
+					><path
+						d="M12 14c-4.42 0-8 3.58-8 8h16c0-4.42-3.58-8-8-8zM12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"
+						fill="#c4c4c4"
+						stroke="black"
+						stroke-width="1"
+					/></svg
+				>People</span
+			>
+			<span class="flex cursor-pointer items-center whitespace-nowrap hover:underline"
+				><svg width="12" height="12" viewBox="0 0 24 24" class="mr-1 mb-[1px]"
+					><rect
+						width="20"
+						height="24"
+						x="2"
+						y="0"
+						fill="#c4c4c4"
+						stroke="black"
+						stroke-width="1"
+					/><line x1="2" y1="8" x2="22" y2="8" stroke="black" stroke-width="1" /><line
+						x1="2"
+						y1="16"
+						x2="22"
+						y2="16"
+						stroke="black"
+						stroke-width="1"
+					/></svg
+				>Yellow Pages</span
+			>
+			<span class="flex cursor-pointer items-center whitespace-nowrap hover:underline"
+				><svg width="12" height="12" viewBox="0 0 24 24" class="mr-1 mb-[1px]"
+					><polygon
+						points="12,22 22,12 16,12 16,2 8,2 8,12 2,12"
+						fill="#bdbdbd"
+						stroke="black"
+						stroke-width="1"
+					/></svg
+				>Download</span
+			>
+			<span class="flex cursor-pointer items-center whitespace-nowrap hover:underline"
+				><svg width="12" height="12" viewBox="0 0 24 24" class="mr-1 mb-[1px]"
+					><rect
+						width="20"
+						height="16"
+						x="2"
+						y="4"
+						rx="2"
+						fill="#d4d4d4"
+						stroke="black"
+						stroke-width="1"
+					/><circle cx="12" cy="20" r="1.5" fill="black" /></svg
+				>Channels</span
+			>
 		</div>
 	</div>
 
-	<div
-		class="m-1 flex-grow {windowHeight
-			? 'min-h-0'
-			: 'h-96'} border-2 border-t-gray-500 border-r-white border-b-white border-l-gray-500 bg-white"
-	>
-		<iframe src={dataUrl} class="h-full w-full border-0" title="Browser content"></iframe>
+	<!-- iframe area -->
+	<div class="relative flex flex-grow flex-col pt-1 {windowHeight ? 'min-h-0' : 'h-96'}">
+		<div
+			class="mx-0.5 flex flex-grow flex-col overflow-hidden border-2 border-t-gray-500 border-r-white border-b-white border-l-gray-500 bg-white"
+		>
+			<div
+				class="relative flex-grow border border-t-black border-r-gray-300 border-b-gray-300 border-l-black"
+			>
+				<iframe
+					src={dataUrl}
+					class="absolute inset-0 h-full w-full border-0 bg-white"
+					title="Browser content"
+				></iframe>
+			</div>
+		</div>
 	</div>
 
-	<div class="flex border-t border-t-white">
+	<!-- Status bar -->
+	<div class="mt-1 flex border-t border-t-white text-black">
+		<div class="flex w-8 items-center justify-center border-r border-solid border-r-gray-500 px-1">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="mb-[2px]"
+				><rect
+					x="6"
+					y="11"
+					width="12"
+					height="10"
+					fill="#afafaf"
+					stroke="black"
+					stroke-width="1.5"
+				/><path d="M8 11V7a4 4 0 018 0v4" stroke="black" stroke-width="1.5" /></svg
+			>
+		</div>
 		<p
-			class="m-0.5 flex-grow border border-t-gray-500 border-l-gray-500 px-1 py-0.5 whitespace-nowrap select-none"
+			class="m-[1px] flex-grow border border-t-gray-500 border-r-white border-b-white border-l-gray-500 px-2 py-0 text-[11px] whitespace-nowrap shadow-[0_1px_0_0_#FFF]"
 		>
 			{statusText}
 		</p>
 		<p
-			class="m-0.5 w-48 border border-t-gray-500 border-l-gray-500 px-1 py-0.5 whitespace-nowrap select-none"
+			class="m-[1px] w-48 border border-t-gray-500 border-r-white border-b-white border-l-gray-500 px-1 py-0 text-[11px] whitespace-nowrap shadow-[0_1px_0_0_#FFF]"
 		></p>
-		<p
-			class="m-0.5 w-5 border border-t-gray-500 border-l-gray-500 px-1 py-0.5 text-center whitespace-nowrap select-none"
+		<div
+			class="m-[1px] flex items-center justify-center border border-t-gray-500 border-r-white border-b-white border-l-gray-500 px-1 py-0.5 shadow-[0_1px_0_0_#FFF]"
 		>
-			🔒
-		</p>
+			<div class="flex gap-[2px]">
+				<div
+					class="h-[8px] w-2 border-r-[3px] border-l-[3px] border-r-black border-l-gray-300 bg-gray-600"
+				></div>
+				<div
+					class="h-[8px] w-2 border-r-[3px] border-l-[3px] border-r-black border-l-gray-300 bg-gray-600"
+				></div>
+				<div
+					class="h-[8px] w-2 border-r-[3px] border-l-[3px] border-r-black border-l-gray-300 bg-gray-600"
+				></div>
+			</div>
+		</div>
 	</div>
 </div>
+\n

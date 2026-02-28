@@ -8,9 +8,10 @@
 	let { children, onclick, disabled = false }: Props = $props();
 
 	const baseClasses =
-		'border-2 border-t-gray-100 border-l-gray-100 border-r-gray-600 border-b-gray-600 px-2 py-1 mr-1 min-w-15 active:border-inset';
-	const normalClasses = 'text-gray-600 hover:bg-gray-300';
-	const disabledClasses = 'text-gray-400 cursor-not-allowed';
+		'flex flex-col items-center justify-center min-w-[50px] px-1.5 py-1 mx-[1px] border border-transparent select-none';
+	const normalClasses =
+		'text-black hover:border-t-white hover:border-l-white hover:border-r-gray-600 hover:border-b-gray-600 active:border-r-white active:border-b-white active:border-t-gray-600 active:border-l-gray-600';
+	const disabledClasses = 'text-gray-400 opacity-50';
 </script>
 
 <button
