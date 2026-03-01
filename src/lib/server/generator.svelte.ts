@@ -14,6 +14,7 @@ export async function generateHtml(
 		model?: string;
 		previousPage?: string;
 		referer?: string;
+		style?: string;
 	} = {
 		generateImages: false,
 		dev: false
@@ -43,7 +44,40 @@ ${options.previousPage}
 		refererContext = `The user navigated to this page from the URL: ${options.referer}.`;
 	}
 
-	let prompt = `Generate late 1990s/early 2000s style HTML for ${url}. Capture the transition from Web 1.0 to early Web 2.0 aesthetics.
+	let designGuidelines = '';
+	if (options.style === '1990s') {
+		designGuidelines = `1990s Web Design Guidelines:
+- Layout: Basic tables for layout, NO CSS positioning
+- Color Palette: Bright, highly saturated web-safe colors (pure red, blue, yellow), stark contrasts.
+- Backgrounds: Repeating background patterns (\`background="..."\` attribute), \`bgcolor\`.
+- Typography: Exclusively 12pt Times New Roman or Courier New. Standard blue underlined hyperlinks.
+- Graphics: Copious use of animated GIFs, "Under Construction" signs, pixel-art separators.
+- Features: <marquee> tags (mandatory), <blink> tags, highly visible table borders (\`border="1"\`).
+- Output ONLY the HTML, no boilerplate. Use archaic tags.`;
+	} else if (options.style === '2010s') {
+		designGuidelines = `2010s Web Design Guidelines:
+- Layout: Modern responsive design concepts, Flexbox, clean grid systems.
+- Color Palette: Flat design approach, muted pastels, subtle grays, vibrant accent colors.
+- Backgrounds: Solid subtle tones, large 'hero' images.
+- Typography: Clean sans-serif fonts (Open Sans, Roboto style), large readable font sizes, good line-height.
+- Graphics: High quality images, rounded corners via CSS, minimalistic SVG icons.
+- Features: Sticky headers, card-based UI, minimal borders, subtle box-shadows.
+- Interactive: Hover states (opacity drops, translate transforms).
+- Output semantic HTML5 elements (<header>, <nav>, <section>, <footer>) with inline styles to emulate a CSS framework.`;
+	} else {
+		// Default 2000s
+		designGuidelines = `Early 2000s Web 2.0 Design Guidelines:
+- Layout: Table-based layouts transitioning to early CSS floats and positioning.
+- Color Palette: Web-safe colors supplemented with glassy/glossy effects, pastel gradients.
+- Backgrounds: Gradient backgrounds, beveled buttons.
+- Typography: Verdana, Arial, Tahoma with <font> tags or early CSS.
+- Navigation: Flash-like button rollovers, top or side navigation bars.
+- Graphics: Glossy badges ("Web 2.0"), reflections, early rounded corner hacks.
+- Interactive: "Click here" buttons, form-based layouts.
+- Output ONLY the complete HTML document within <html> tags.`;
+	}
+
+	let prompt = `Generate HTML for ${url}. Capture the aesthetics of the requested era.
 
 ${textContext}
 ${refererContext}
@@ -54,22 +88,12 @@ ${previousPageContext}
 
 --- End Previous Page ---
 
-Late 90s/Early 2000s Design Guidelines:
-- Layout: Table-based layouts with some early CSS positioning
-- Color Palette: Web-safe colors, gradient backgrounds, beveled buttons
-- Typography: Verdana, Arial, Times New Roman with <font> tags
-- Navigation: Flash-like button rollovers, dropdown menus, "skip intro" links
-- Graphics: Animated GIFs, pixel art, early Flash content placeholders
-- Content: "Welcome to my site" intros, guestbooks, hit counters, "best viewed in IE5+"
-- Ads: Banner ads, "click here" buttons, affiliate links
-- Interactive: Form mail scripts, simple JavaScript effects
+${designGuidelines}
 
 Technical Constraints:
-- Use HTML 4.01 Transitional or XHTML 1.0
-- Limited CSS2 properties (no CSS3)
-- No JavaScript
-- No modern HTML5 elements
-- All content must work without JavaScript
+- Use inline styles where possible or a single <style> block.
+- No JavaScript (unless explicitly requested later).
+- All content must work without JavaScript.
 
 ${
 	options.generateImages

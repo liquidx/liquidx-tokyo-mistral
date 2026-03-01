@@ -16,6 +16,7 @@
 	let loadImages = $state(true);
 	let loadJavascript = $state(false);
 	let currentModel = $state('devstral-latest');
+	let currentStyle = $state('2000s');
 
 	const handleUrlChange = async (
 		event: CustomEvent<{ url: string; text?: string; previousPage?: string; referer?: string }>
@@ -37,7 +38,8 @@
 					includeImages: loadImages,
 					model: currentModel,
 					previousPage: event.detail.previousPage,
-					referer: event.detail.referer
+					referer: event.detail.referer,
+					style: currentStyle
 				})
 			});
 
@@ -142,4 +144,5 @@
 	bind:loadImages
 	bind:loadJavascript
 	bind:model={currentModel}
+	bind:styleType={currentStyle}
 />

@@ -118,6 +118,7 @@
 		onreload?: () => void;
 		onhome?: () => void;
 		model?: string;
+		styleType?: string;
 	}
 
 	let {
@@ -134,7 +135,8 @@
 		onforward,
 		onreload,
 		onhome,
-		model = $bindable('devstral-latest')
+		model = $bindable('devstral-latest'),
+		styleType = $bindable('2000s')
 	}: Props = $props();
 
 	let menuBarData: Menu[] = $derived([
@@ -172,7 +174,11 @@
 				{ label: 'Reload', shortcut: 'Ctrl+R', action: 'reload' },
 				{ label: 'Reload Frame', shortcut: '' },
 				{ separator: true },
-				{ label: 'Document Source', shortcut: 'Ctrl+U' }
+				{ label: 'Document Source', shortcut: 'Ctrl+U' },
+				{ separator: true },
+				{ label: '1990s Style', action: 'setStyle1990s', checked: styleType === '1990s' },
+				{ label: '2000s Style', action: 'setStyle2000s', checked: styleType === '2000s' },
+				{ label: '2010s Style', action: 'setStyle2010s', checked: styleType === '2010s' }
 			]
 		},
 		{
@@ -496,6 +502,9 @@
 										if (item.action === 'setModelCodestral') model = 'codestral-latest';
 										if (item.action === 'setModelMistralMedium') model = 'mistral-medium-latest';
 										if (item.action === 'setModelMistralLarge') model = 'mistral-large-latest';
+										if (item.action === 'setStyle1990s') styleType = '1990s';
+										if (item.action === 'setStyle2000s') styleType = '2000s';
+										if (item.action === 'setStyle2010s') styleType = '2010s';
 									}}
 								>
 									<div>
