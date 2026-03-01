@@ -17,7 +17,9 @@
 	let loadJavascript = $state(false);
 	let currentModel = $state('devstral-latest');
 
-	const handleUrlChange = async (event: CustomEvent<{ url: string; text?: string }>) => {
+	const handleUrlChange = async (
+		event: CustomEvent<{ url: string; text?: string; previousPage?: string; referer?: string }>
+	) => {
 		console.log('URL changed to:', event.detail.url);
 		isLoading = true;
 
@@ -33,7 +35,9 @@
 					text: event.detail.text,
 					includeJs: loadJavascript,
 					includeImages: loadImages,
-					model: currentModel
+					model: currentModel,
+					previousPage: event.detail.previousPage,
+					referer: event.detail.referer
 				})
 			});
 
@@ -75,7 +79,14 @@
 		console.log('Link clicked:', event.detail.text, 'URL:', event.detail.url);
 		// Trigger the same URL change handler
 		handleUrlChange(
-			new CustomEvent('urlchange', { detail: { url: event.detail.url, text: event.detail.text } })
+			new CustomEvent('urlchange', {
+				detail: {
+					url: event.detail.url,
+					text: event.detail.text,
+					previousPage: htmlBody,
+					referer: currentUrl
+				}
+			})
 		);
 	};
 

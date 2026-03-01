@@ -12,6 +12,8 @@ export async function generateHtml(
 		generateImages: boolean;
 		dev: boolean;
 		model?: string;
+		previousPage?: string;
+		referer?: string;
 	} = {
 		generateImages: false,
 		dev: false
@@ -27,9 +29,30 @@ export async function generateHtml(
 			'. Use this as context to determine what may be on that page.';
 	}
 
+	let previousPageContext = '';
+	if (options.previousPage) {
+		previousPageContext = `The user navigated here from a previous page. Use the following HTML from the previous page as context to maintain stylistic and narrative consistency with the new page:
+		
+${options.previousPage}
+
+`;
+	}
+
+	let refererContext = '';
+	if (options.referer) {
+		refererContext = `The user navigated to this page from the URL: ${options.referer}.`;
+	}
+
 	let prompt = `Generate late 1990s/early 2000s style HTML for ${url}. Capture the transition from Web 1.0 to early Web 2.0 aesthetics.
 
 ${textContext}
+${refererContext}
+
+--- Previous Page ---
+
+${previousPageContext}
+
+--- End Previous Page ---
 
 Late 90s/Early 2000s Design Guidelines:
 - Layout: Table-based layouts with some early CSS positioning

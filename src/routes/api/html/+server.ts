@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	const body = await request.json();
-	const { url, text, includeJs, includeImages, model } = body;
+	const { url, text, includeJs, includeImages, model, previousPage, referer } = body;
 
 	if (!url) {
 		return json({ error: 'URL is required' }, { status: 400 });
@@ -22,7 +22,9 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	const html = await generateHtml(url, text, {
 		generateImages: includeImages,
 		dev: dev,
-		model: model
+		model: model,
+		previousPage: previousPage,
+		referer: referer
 	});
 
 	let finalHtml = html;
