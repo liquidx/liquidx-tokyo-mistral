@@ -13,7 +13,7 @@
 	let history = $state<HistoryEntry[]>([]);
 	let currentHistoryIndex = $state(-1);
 	let currentUrl = $state('');
-	let loadImages = $state(true);
+	let loadImages = $state(false);
 	let loadJavascript = $state(false);
 
 	const handleUrlChange = async (event: CustomEvent<{ url: string; text?: string }>) => {
