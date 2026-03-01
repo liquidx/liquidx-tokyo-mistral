@@ -205,7 +205,7 @@
 			label: '<u>W</u>indow',
 			items: [{ label: 'Bookmarks', shortcut: 'Ctrl+B' }]
 		},
-		{ id: 'help', label: '<u>H</u>elp', items: [{ label: 'About Netscape...' }] }
+		{ id: 'help', label: '<u>H</u>elp', items: [{ label: 'About Miscape...' }] }
 	]);
 
 	// Update currentUrl when prop changes (for back navigation)
