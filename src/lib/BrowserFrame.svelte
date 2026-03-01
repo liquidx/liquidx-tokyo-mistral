@@ -182,10 +182,7 @@
 				{ label: 'Back', shortcut: 'Alt+Left', action: 'back' },
 				{ label: 'Forward', shortcut: 'Alt+Right', action: 'forward' },
 				{ label: 'Home', action: 'home' },
-				{ label: 'Stop Loading', shortcut: 'Esc' },
-				{ separator: true },
-				{ label: 'Load Images', action: 'toggleImages', checked: loadImages },
-				{ label: 'Load Javascript', action: 'toggleJavascript', checked: loadJavascript }
+				{ label: 'Stop Loading', shortcut: 'Esc' }
 			]
 		},
 		{
@@ -197,16 +194,35 @@
 			id: 'options',
 			label: '<u>O</u>ptions',
 			items: [
-				{ label: 'General Preferences...' },
-				{ separator: true },
 				{ label: 'Load Images', action: 'toggleImages', checked: loadImages },
 				{ label: 'Load Javascript', action: 'toggleJavascript', checked: loadJavascript }
 			]
 		},
 		{
-			id: 'window',
-			label: '<u>W</u>indow',
-			items: [{ label: 'Bookmarks', shortcut: 'Ctrl+B' }]
+			id: 'model',
+			label: '<u>M</u>odel',
+			items: [
+				{
+					label: 'devstral-latest',
+					action: 'setModelDevstral',
+					checked: model === 'devstral-latest'
+				},
+				{
+					label: 'codestral-latest',
+					action: 'setModelCodestral',
+					checked: model === 'codestral-latest'
+				},
+				{
+					label: 'mistral-medium-latest',
+					action: 'setModelMistralMedium',
+					checked: model === 'mistral-medium-latest'
+				},
+				{
+					label: 'mistral-large-latest',
+					action: 'setModelMistralLarge',
+					checked: model === 'mistral-large-latest'
+				}
+			]
 		},
 		{
 			id: 'help',
@@ -476,6 +492,10 @@
 										if (item.action === 'toggleImages') loadImages = !loadImages;
 										if (item.action === 'toggleJavascript') loadJavascript = !loadJavascript;
 										if (item.action === 'showAbout') showAboutDialog = true;
+										if (item.action === 'setModelDevstral') model = 'devstral-latest';
+										if (item.action === 'setModelCodestral') model = 'codestral-latest';
+										if (item.action === 'setModelMistralMedium') model = 'mistral-medium-latest';
+										if (item.action === 'setModelMistralLarge') model = 'mistral-large-latest';
 									}}
 								>
 									<div>
@@ -691,16 +711,6 @@
 			onkeydown={handleKeyDown}
 			onfocus={handleFocus}
 		/>
-
-		<select
-			class="mx-1 h-6 border-2 border-t-gray-600 border-r-white border-b-white border-l-gray-600 bg-white px-1 py-0.5 text-[11px] focus:outline-none"
-			bind:value={model}
-		>
-			<option value="devstral-latest">devstral-latest</option>
-			<option value="codestral-latest">codestral-latest</option>
-			<option value="mistral-medium-latest">mistral-medium-latest</option>
-			<option value="mistral-large-latest">mistral-large-latest</option>
-		</select>
 
 		<button class="mx-0.5 flex items-center px-1.5 py-0.5 font-bold" onclick={handleGoClick}>
 			<span class="mx-1 text-[13px] whitespace-nowrap">Go</span>
