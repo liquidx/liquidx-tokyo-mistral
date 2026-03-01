@@ -1,6 +1,5 @@
 <html>
 	<body style="padding: 16px; max-width: 400px; font-family: sans-serif;">
-		<h1>The Eternal Browser of the Spotless Transformer Mind.</h1>
 		<p>
 		Type the URL of your dreams into the location bar and hit enter, the LLM will tell you want it thinks the website will look like.
 		The weirder the better. 
@@ -8,11 +7,24 @@
 		<h2>Examples</h2>
 		<ul>
 		<li><a href="http://twitter.com/@christophercolumbus">twitter.com/@christophercolumbus</a></li>
-		<li><a href="http://twitter.com/@shakespeare">http://twitter.com/@shakespeare</a></li>
+		<li><a href="http://twitter.com/@shakespeare">twitter.com/@shakespeare</a></li>
     <li><a href="http://geocities.com/ResearchTriangle/1979/">geocities.com/ResearchTriangle/1979/</a></li>
     <li><a href="http://winamp.com/">winamp.com</a></li>
 		<li><a href="http://greatestpoems.com/">greatestpoems.com</a></li>
 		<li><a href="http://cutest-llamas.org/">cutest-llamas.org</a></li>
+    </ul>
+
+    <p style="margin-top: 48px">
+      The way this hack works is by taking the URL and getting the LLM to generate the HTML for the URL.
+    </p>
+
+    <p>Along the way, it will fan out and also generate approximation for images that might be contained, and optionally
+      any Javascript that could be running on the page.</p>
+
+    <p>For the HTML generation, some amount of prompt refinement was needed to make the LLM generate the HTML in a way that
+      could be rendered in a browser. Subsequently, I found it easier to use Mistral Vibe to iterate on the prompt and 
+    directly edit the prompt after explaining to it what I wanted.</p>
+
 		
 		</ul>
 

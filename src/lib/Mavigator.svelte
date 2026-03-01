@@ -13,7 +13,7 @@
 	let history = $state<HistoryEntry[]>([]);
 	let currentHistoryIndex = $state(-1);
 	let currentUrl = $state('');
-	let loadImages = $state(false);
+	let loadImages = $state(true);
 	let loadJavascript = $state(false);
 	let currentModel = $state('devstral-latest');
 

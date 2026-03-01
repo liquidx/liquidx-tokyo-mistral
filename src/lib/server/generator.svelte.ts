@@ -27,21 +27,39 @@ export async function generateHtml(
 			'. Use this as context to determine what may be on that page.';
 	}
 
-	let prompt = `Imagine you have no internet connection, but you have the cached version of any web page on the internet.
-    
-    Output what you expect to be at the following URL at ${url} as HTML.
-    
-    ${textContext}
-    
-    Only output everything that should be within the <html> tag including the <style> and <body> tags.
-    Use the appropriate colors for the website that you think is appropriate for the URL.
-    Do not add any explanation to the result.
-    The result should be able to be rendered in a web browser.
-    Do not add any backticks.
-		Generate CSS that corresponds to the era that this website would be relevant. 
-		
-		Ensure the design is nice looking and things are spaced correctly.
-		`;
+	let prompt = `Generate late 1990s/early 2000s style HTML for ${url}. Capture the transition from Web 1.0 to early Web 2.0 aesthetics.
+
+${textContext}
+
+Late 90s/Early 2000s Design Guidelines:
+- Layout: Table-based layouts with some early CSS positioning
+- Color Palette: Web-safe colors, gradient backgrounds, beveled buttons
+- Typography: Verdana, Arial, Times New Roman with <font> tags
+- Navigation: Flash-like button rollovers, dropdown menus, "skip intro" links
+- Graphics: Animated GIFs, pixel art, early Flash content placeholders
+- Content: "Welcome to my site" intros, guestbooks, hit counters, "best viewed in IE5+"
+- Ads: Banner ads, "click here" buttons, affiliate links
+- Interactive: Form mail scripts, simple JavaScript effects
+
+Technical Constraints:
+- Use HTML 4.01 Transitional or XHTML 1.0
+- Limited CSS2 properties (no CSS3)
+- No JavaScript
+- No modern HTML5 elements
+- All content must work without JavaScript
+
+${
+	options.generateImages
+		? `
+Image Handling:
+- Icons as inline SVGs
+- Images with src, alt, width, height attributes
+- Early 2000s aesthetic: web-safe colors, simple graphics`
+		: `
+All images must be inline SVGs matching the era's style`
+}
+
+IMPORTANT: Output ONLY the complete HTML document within <html> tags. NO explanations, comments about the era, or backticks. The HTML should be ready to render in a browser.`;
 
 	if (options.generateImages) {
 		prompt += `
@@ -166,6 +184,35 @@ Only output the raw Javascript code. Do not include <script> tags. Do not add an
 
 	return jsCode;
 }
+
+export const generateSVG = async (
+	baseUrl: string,
+	imageDescription: string,
+	width: string,
+	height: string
+) => {
+	const prompt = `Generate a scalable vector graphic (SVG) that would be appropriate for the website ${baseUrl}.
+The image should be described as: ${imageDescription}.
+The SVG should have width="${width}" and height="${height}".
+Only output the raw SVG code, with no markdown backticks, no HTML wrapping, just the <svg> opening and </svg> closing tags and everything inside. Do not include an XML declaration.`;
+
+	const model = createMistral({ apiKey: MISTRAL_API_KEY })('devstral-latest');
+	const output = await generateText({
+		model,
+		prompt
+	});
+
+	let svgCode = output.text
+		.replace(/```xml/gi, '')
+		.replace(/```svg/gi, '')
+		.replace(/```html/gi, '')
+		.replace(/```/g, '')
+		.trim();
+
+	const url = `data:image/svg+xml;utf8,${encodeURIComponent(svgCode)}`;
+	console.log('Generated SVG URL: ' + url);
+	return url;
+};
 
 export const generateImage = async (
 	baseUrl: string,

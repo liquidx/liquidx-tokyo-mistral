@@ -3,7 +3,10 @@
 	import BrowserFrameButton from './BrowserFrameButton.svelte';
 	import BrowserFrameWindowButton from './BrowserFrameWindowButton.svelte';
 	import BrowserFrameLoadingIndicator from './BrowserFrameLoadingIndicator.svelte';
+	import AboutDialog from './AboutDialog.svelte';
 	import MistralLogo from './images/mistral.svg?raw';
+
+	let showAboutDialog = $state(false);
 
 	export interface MenuItem {
 		label?: string;
@@ -205,7 +208,11 @@
 			label: '<u>W</u>indow',
 			items: [{ label: 'Bookmarks', shortcut: 'Ctrl+B' }]
 		},
-		{ id: 'help', label: '<u>H</u>elp', items: [{ label: 'About Miscape...' }] }
+		{
+			id: 'help',
+			label: '<u>H</u>elp',
+			items: [{ label: 'About Miscape...', action: 'showAbout' }]
+		}
 	]);
 
 	// Update currentUrl when prop changes (for back navigation)
@@ -468,6 +475,7 @@
 										if (item.action === 'reload' && onreload) onreload();
 										if (item.action === 'toggleImages') loadImages = !loadImages;
 										if (item.action === 'toggleJavascript') loadJavascript = !loadJavascript;
+										if (item.action === 'showAbout') showAboutDialog = true;
 									}}
 								>
 									<div>
@@ -831,3 +839,7 @@
 		</div>
 	</div>
 </div>
+
+{#if showAboutDialog}
+	<AboutDialog onclose={() => (showAboutDialog = false)} />
+{/if}

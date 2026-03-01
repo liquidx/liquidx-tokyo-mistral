@@ -1,7 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
-import { generateImage } from '$lib/server/generator.svelte';
+import { generateSVG } from '$lib/server/generator.svelte';
 
 export const HEAD: RequestHandler = async () => {
 	console.log('HEAD request to /api/img');
@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	console.log('Generating image for URL: ' + baseUrl, 'imageDescription: ' + imageDescription);
 
-	const url = await generateImage(baseUrl, imageDescription, width, height);
+	const url = await generateSVG(baseUrl, imageDescription, width, height);
 
 	return json(
 		{ url },
