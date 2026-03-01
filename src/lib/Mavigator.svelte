@@ -15,6 +15,7 @@
 	let currentUrl = $state('');
 	let loadImages = $state(false);
 	let loadJavascript = $state(false);
+	let currentModel = $state('devstral-latest');
 
 	const handleUrlChange = async (event: CustomEvent<{ url: string; text?: string }>) => {
 		console.log('URL changed to:', event.detail.url);
@@ -31,7 +32,8 @@
 					url: event.detail.url,
 					text: event.detail.text,
 					includeJs: loadJavascript,
-					includeImages: loadImages
+					includeImages: loadImages,
+					model: currentModel
 				})
 			});
 
@@ -128,4 +130,5 @@
 	currentUrlProp={currentUrl}
 	bind:loadImages
 	bind:loadJavascript
+	bind:model={currentModel}
 />

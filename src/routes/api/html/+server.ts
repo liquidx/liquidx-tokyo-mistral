@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	const body = await request.json();
-	const { url, text, includeJs, includeImages } = body;
+	const { url, text, includeJs, includeImages, model } = body;
 
 	if (!url) {
 		return json({ error: 'URL is required' }, { status: 400 });
@@ -15,15 +15,20 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	console.log(
 		'Generating HTML for URL: ' + url,
 		'includeJs: ' + includeJs,
-		'includeImages: ' + includeImages
+		'includeImages: ' + includeImages,
+		'model: ' + model
 	);
 
-	const html = await generateHtml(url, text, { generateImages: includeImages, dev: dev });
+	const html = await generateHtml(url, text, {
+		generateImages: includeImages,
+		dev: dev,
+		model: model
+	});
 
 	let finalHtml = html;
 	let scriptTag = '';
 	if (includeJs) {
-		const jsCode = await generateJavascript(url, html);
+		const jsCode = await generateJavascript(url, html, model);
 		scriptTag = `\n<script>\n${jsCode}\n</script>\n`;
 	}
 

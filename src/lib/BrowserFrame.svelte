@@ -114,6 +114,7 @@
 		onforward?: () => void;
 		onreload?: () => void;
 		onhome?: () => void;
+		model?: string;
 	}
 
 	let {
@@ -129,7 +130,8 @@
 		onback,
 		onforward,
 		onreload,
-		onhome
+		onhome,
+		model = $bindable('devstral-latest')
 	}: Props = $props();
 
 	let menuBarData: Menu[] = $derived([
@@ -504,7 +506,7 @@
 					stroke-width="2.5"
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					class="mb-[1px]"
+					class="mb-px"
 				>
 					<path d="M15 18l-6-6 6-6" />
 				</svg>
@@ -520,7 +522,7 @@
 					stroke-width="2.5"
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					class="mb-[1px]"
+					class="mb-px"
 				>
 					<path d="M9 18l6-6-6-6" />
 				</svg>
@@ -681,6 +683,16 @@
 			onkeydown={handleKeyDown}
 			onfocus={handleFocus}
 		/>
+
+		<select
+			class="mx-1 h-6 border-2 border-t-gray-600 border-r-white border-b-white border-l-gray-600 bg-white px-1 py-0.5 text-[11px] focus:outline-none"
+			bind:value={model}
+		>
+			<option value="devstral-latest">devstral-latest</option>
+			<option value="codestral-latest">codestral-latest</option>
+			<option value="mistral-medium-latest">mistral-medium-latest</option>
+			<option value="mistral-large-latest">mistral-large-latest</option>
+		</select>
 
 		<button class="mx-0.5 flex items-center px-1.5 py-0.5 font-bold" onclick={handleGoClick}>
 			<span class="mx-1 text-[13px] whitespace-nowrap">Go</span>

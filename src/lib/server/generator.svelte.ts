@@ -11,6 +11,7 @@ export async function generateHtml(
 	options: {
 		generateImages: boolean;
 		dev: boolean;
+		model?: string;
 	} = {
 		generateImages: false,
 		dev: false
@@ -52,7 +53,8 @@ export async function generateHtml(
 			All images must be inlined SVGs.`;
 	}
 
-	const model = createMistral({ apiKey: MISTRAL_API_KEY })('devstral-latest');
+	const modelToUse = options.model || 'devstral-latest';
+	const model = createMistral({ apiKey: MISTRAL_API_KEY })(modelToUse);
 	const output = await generateText({
 		model,
 		prompt
@@ -133,7 +135,11 @@ export async function generateHtml(
 	return outputText;
 }
 
-export async function generateJavascript(url: string, htmlSnippet: string): Promise<string> {
+export async function generateJavascript(
+	url: string,
+	htmlSnippet: string,
+	preferredModel?: string
+): Promise<string> {
 	const jsPrompt = `Here is an HTML snippet for the URL ${url}:
 
 ${htmlSnippet}
@@ -143,7 +149,8 @@ Only output the raw Javascript code. Do not include <script> tags. Do not add an
 
 	console.log(jsPrompt);
 
-	const model = createMistral({ apiKey: MISTRAL_API_KEY })('devstral-latest');
+	const modelToUse = preferredModel || 'devstral-latest';
+	const model = createMistral({ apiKey: MISTRAL_API_KEY })(modelToUse);
 	const jsOutput = await generateText({
 		model,
 		prompt: jsPrompt
