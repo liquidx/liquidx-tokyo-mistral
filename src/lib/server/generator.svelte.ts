@@ -210,7 +210,6 @@ Only output the raw SVG code, with no markdown backticks, no HTML wrapping, just
 		.trim();
 
 	const url = `data:image/svg+xml;utf8,${encodeURIComponent(svgCode)}`;
-	console.log('Generated SVG URL: ' + url);
 	return url;
 };
 
@@ -242,8 +241,6 @@ export const generateImage = async (
 		console.log('No output found');
 		return null;
 	}
-
-	console.log(output);
 
 	let contents = (output as any).content;
 	if (!contents || contents.length == 0) {
